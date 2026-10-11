@@ -1,0 +1,51 @@
+
+{% extends "base.html" %}
+
+{% block title %}Track Donation | FoodShare{% endblock %}
+
+{% block content %}
+<h1>Donation Tracking</h1>
+
+<div class="card">
+    <h2>{{ donation_request.food.food_name }}</h2>
+    <p>NGO: {{ donation_request.ngo.username }}</p>
+    <p>Donor: {{ donation_request.food.donor.username }}</p>
+    <p>Request status: {{ donation_request.get_status_display }}</p>
+
+    {% if tracking %}
+        <p>Delivery status: <strong>{{ tracking.get_status_display }}</strong></p>
+
+        <ul class="timeline">
+            <li>Approved</li>
+            <li>
+                Collected
+                {% if tracking.collected_at %}
+                    — {{ tracking.collected_at|date:"d M Y, H:i" }}
+                {% endif %}
+            </li>
+            <li>
+                Delivered
+                {% if tracking.delivered_at %}
+                    — {{ tracking.delivered_at|date:"d M Y, H:i" }}
+                {% endif %}
+            </li>
+        </ul>
+
+        {% if user.role == "ngo" and tracking.status == "approved" %}
+            <form method="post" action="{% url 'update_tracking' donation_request.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="collected">
+                <button class="button" type="submit">Mark as Collected</button>
+            </form>
+        {% elif user.role == "ngo" and tracking.status == "collected" %}
+            <form method="post" action="{% url 'update_tracking' donation_request.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="delivered">
+                <button class="button" type="submit">Mark as Delivered</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p>Tracking will be available once the donor approves the request.</p>
+    {% endif %}
+</div>
+{% endblock %}

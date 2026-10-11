@@ -1,0 +1,27 @@
+
+{% extends "base.html" %}
+
+{% block title %}Available Food | FoodShare{% endblock %}
+
+{% block content %}
+<h1>Available Food Donations</h1>
+
+{% if user.is_authenticated and user.role == "donor" %}
+    <a class="button" href="{% url 'add_food' %}">Add Food</a>
+{% endif %}
+
+<div class="grid">
+    {% for food in foods %}
+        <article class="card">
+            <h2>{{ food.food_name }}</h2>
+            <p>{{ food.description|truncatewords:25 }}</p>
+            <p>Quantity: {{ food.quantity }} servings</p>
+            <p>Pickup: {{ food.pickup_location }}</p>
+            <p>Safe until: {{ food.safe_until|date:"d M Y, H:i" }}</p>
+            <a href="{% url 'food_detail' food.pk %}">View details</a>
+        </article>
+    {% empty %}
+        <p>No available food donations found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

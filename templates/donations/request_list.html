@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+
+{% block title %}Donation Requests | FoodShare{% endblock %}
+
+{% block content %}
+<h1>Donation Requests</h1>
+
+<div class="grid">
+    {% for item in requests %}
+        <article class="card">
+            <h2>{{ item.food.food_name }}</h2>
+            <p>NGO: {{ item.ngo.username }}</p>
+            <p>Donor: {{ item.food.donor.username }}</p>
+            <p>Status: <strong>{{ item.get_status_display }}</strong></p>
+
+            {% if user.role == "donor" and item.status == "pending" %}
+                <form method="post" action="{% url 'approve_request' item.pk %}">
+                    {% csrf_token %}
+                    <button class="button" type="submit">Approve</button>
+                </form>
+                <form method="post" action="{% url 'reject_request' item.pk %}">
+                    {% csrf_token %}
+                    <button class="button danger" type="submit">Reject</button>
+                </form>
+            {% endif %}
+
+            {% if item.status == "approved" or item.status == "collected" or item.status == "delivered" %}
+                <a href="{% url 'track_donation' item.pk %}">Track donation</a>
+            {% endif %}
+        </article>
+    {% empty %}
+        <p>No donation requests found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

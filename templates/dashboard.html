@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | FoodShare{% endblock %}
+
+{% block content %}
+<h1>Welcome, {{ user.username }}!</h1>
+<p>Your role: <strong>{{ user.get_role_display }}</strong></p>
+
+{% if user.role == "donor" %}
+    <a class="button" href="{% url 'add_food' %}">Add Food Donation</a>
+    <a class="button secondary" href="{% url 'request_list' %}">View NGO Requests</a>
+
+    <h2>Your Food Donations</h2>
+    <div class="grid">
+        {% for food in donations %}
+            <article class="card">
+                <h3>{{ food.food_name }}</h3>
+                <p>Quantity: {{ food.quantity }} servings</p>
+                <p>Status: <strong>{{ food.get_status_display }}</strong></p>
+                <a href="{% url 'food_detail' food.pk %}">View donation</a>
+            </article>
+        {% empty %}
+            <p>You have not listed any food donations yet.</p>
+        {% endfor %}
+    </div>
+{% else %}
+    <a class="button" href="{% url 'food_list' %}">Find Food</a>
+    <h2>Your Donation Requests</h2>
+
+    <div class="grid">
+        {% for item in requests %}
+            <article class="card">
+                <h3>{{ item.food.food_name }}</h3>
+                <p>Status: {{ item.get_status_display }}</p>
+                <a href="{% url 'track_donation' item.pk %}">View tracking</a>
+            </article>
+        {% empty %}
+            <p>You have not requested any donations yet.</p>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

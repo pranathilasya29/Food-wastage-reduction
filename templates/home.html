@@ -1,0 +1,31 @@
+
+{% extends "base.html" %}
+
+{% block title %}Home | FoodShare{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Share Food. Reduce Waste. Help People.</h1>
+    <p>Connect surplus food with communities that need it.</p>
+    <a class="button" href="{% url 'food_list' %}">Explore Available Food</a>
+    {% if user.is_authenticated and user.role == "donor" %}
+        <a class="button secondary" href="{% url 'add_food' %}">Donate Food</a>
+    {% endif %}
+</section>
+
+<h2>Recently Available Food</h2>
+
+<div class="grid">
+    {% for food in available_foods %}
+        <article class="card">
+            <h3>{{ food.food_name }}</h3>
+            <p>{{ food.description|truncatewords:20 }}</p>
+            <p><strong>Quantity:</strong> {{ food.quantity }} servings</p>
+            <p><strong>Pickup:</strong> {{ food.pickup_location }}</p>
+            <a href="{% url 'food_detail' food.pk %}">View details</a>
+        </article>
+    {% empty %}
+        <p>No food donations are available right now.</p>
+    {% endfor %}
+</div>
+{% endblock %}
